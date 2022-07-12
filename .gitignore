@@ -1,0 +1,53 @@
+from keras.datasets import mnist
+from keras.utils import np_utils
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPooling2D
+
+import keras
+import matplotlib.pyplot as plt
+import numpy 
+import os
+import tensorflow as tf
+
+
+(train_data, train_target),(test_data, test_target) = mnist.load_data()
+
+train_data = train_data.reshape(train_data.shape[0], 28, 28, 1).astype('float32')/255.0
+test_data = test_data.reshape(test_data.shape[0], 28, 28, 1).astype('float32')/255.0
+
+train_target = np_utils.to_categorical(train_target)
+test_target = np_utils.to_categorical(test_target)
+
+
+
+from keras.layers.convolutional import Conv
+
+model = Sequential()
+
+model.add(Conv2D(filters = 32, kernel_size=(5, 5), activation = 'relu',
+                 input_shape = (28, 28, 1)))
+model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+
+model.add(Conv2D(filters = 62, kernel_size=(5, 5), activation = 'relu'))
+model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
+
+model.add(Flatten())
+model.add(Dense(1000, activation='relu'))
+model.add(Dense(10, activation='softmax'))
+
+
+model.compile(loss= 'categorical_crossentropy'  , 
+              optimizer= 'adam'  , 
+              metrics=['accuracy'])
+
+             
+history = model.fit(train_data, train_target, epochs=10)
+
+
+test_loss, test_acc = model.evaluate(test_data, test_target) 
+
+predictions = model.predict(test_data)
+predictions[3]
+np.argmax(predictions[3])
+
+print(test_target[3])
